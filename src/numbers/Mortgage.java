@@ -10,7 +10,7 @@ public class Mortgage {
 		double monthlyPayment = 0;
 		double balance = 0;
 		int compoundPeriod = 0;
-		int terms;
+		int term;
 		
 		System.out.printf("Enter the loan amount: ");
 		loan = keyboard.nextDouble();
@@ -18,63 +18,32 @@ public class Mortgage {
 		System.out.printf("Enter the interest rate on the loan: ");
 		interestRate = keyboard.nextDouble();
 		
-		System.out.printf("Enter the term(years) for the loan: ");
-		terms = keyboard.nextInt();
-		
-		System.out.printf("\nWhat is the compounding period\n"
-				+ "[1 for continually, 2 for Daily, 3 for Weekly, 4 for monthly]: ");
-		compoundPeriod = keyboard.nextInt();
+		System.out.printf("Enter the term(years) for the loan payment: ");
+		term = keyboard.nextInt();
 		
 		System.out.printf("\n================================================================\n");
-		switch (compoundPeriod) {
-			case 1:
-				balance = (loan * Math.pow(Math.E, (interestRate / 100.0) * terms));
-				monthlyPayment = balance / (terms * 12);
-				System.out.printf("Amount owing: %.2f\n", balance);
-				System.out.printf("Minimum monthly payments: %.2f\n", monthlyPayment);
-				break;
-				
-			case 2:
-				balance = periodicCompound(loan, interestRate, terms, 365);
-				monthlyPayment = balance / (terms * 12);
-				System.out.printf("Amount owing: %.2f\n", balance);
-				System.out.printf("Minimum monthly payments: %.2f\n", monthlyPayment);
-				break;
-			
-			case 3:
-				balance = periodicCompound(loan, interestRate, terms, 54);
-				monthlyPayment = balance / (terms * 12);
-				System.out.printf("Amount owing: %.2f\n", balance);
-				System.out.printf("Minimum monthly payments: %.2f\n", monthlyPayment);
-				break;
-
-			case 4:
-				balance = periodicCompound(loan, interestRate, terms, 12);
-				monthlyPayment = balance / (terms * 12);
-				System.out.printf("Amount owing: %.2f\n", balance);
-				System.out.printf("Minimum monthly payments: %.2f\n", monthlyPayment);
-				break;
-			default:
-				System.out.printf("Invalid compoundind period\n");
-		}
-		
 		keyboard.close();
+
+		monthlyPayment = getMonthlyPayment(loan, interestRate, term);
+		balance = -(monthlyPayment * (term * 12));
+		System.out.format("%-30s$%-+10.2f%n", "Amount owed to bank:", balance);
+		System.out.format("%-30s$%-10.2f%n", "Minimum monthly payment:", monthlyPayment);
 	}
+
 	/**
-	 * Calculate the balance on a loan after a given term using the formula
-	 * A(t) = A0 * ( 1 + (r / n))^(floor(n * t)), where A is the balance after
-	 * the repayment term, A0 is the loan amount, r is the interest rate, n is
-	 * the number of compounds in a year, and t is the repayment term in years. 
+	 * Calculate the monthly payment of a loan.
 	 * 
 	 * @param loan Amount borrowed
 	 * @param interestRate Interest rate on the loan
-	 * @param terms Repayment terms in years 
-	 * @param compoundPeriods Number of compounds in a term
-	 * @return The balance on the loan after the end of the repayment term
+	 * @param term Repayment term in years 
+	 * @return The monthly payment of a loan given interest rate, amount and term 
 	 */
-	public static double periodicCompound(double loan, double interestRate, int terms, int compoundPeriods) {
+	public static double getMonthlyPayment(double loan, double interestRate, double term) {
+		double rate = (interestRate / 100) / 12;
+		double base = (rate + 1);
+		double months = term * 12;
 		double result = 0;
-		result = loan * Math.pow((1 + ((interestRate / 100.0) / compoundPeriods)), Math.floor(compoundPeriods * terms));
+		result = loan * (rate * (Math.pow(base, months)) / ((Math.pow(base, months)) - 1)); 
 		
 		return result;
 	}
